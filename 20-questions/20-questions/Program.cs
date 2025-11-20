@@ -5,6 +5,14 @@ namespace _20_questions
 {
     internal class Program
     {
+        //making the category animals for simplicity
+
+        //someone handling the file reader stuff -> kaylah
+        //someone handling the node class and converting the file line into a node -> sam
+        //someone making the outer repeat game stuff -> max
+        //someone do the inner run game stuff -> vicky
+        //someone handling adding the new question to the file -> meghan
+
         //first node
         //stream reader -> get the questions our
         //stream write -> "learning" portion 
@@ -14,7 +22,7 @@ namespace _20_questions
 
             //instatiate current response + line number
                 //while the response value isn't predefined yes or no case
-                    //ask the first node question
+                    //ask the question
                     //get user input
                 //if win
                     //you win
