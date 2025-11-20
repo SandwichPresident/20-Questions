@@ -18,9 +18,19 @@ namespace _20_questions
         //stream write -> "learning" portion 
         static void Main(string[] args)
         {
-            //while loop -> run until user input is defined end case
+            // Initialize variables
+            Boolean gameOver = false;
+            string line;
+            string response;
 
-            //instatiate current response + line number
+            // Welcome message
+            Console.WriteLine("Welcome to 20 Questions!");
+            Console.WriteLine("Think of an animal, and I will try to guess it.");
+
+            //while loop -> run until user input is defined end case
+            while (!gameOver)
+            {
+                //instatiate current response + line number
                 //while the response value isn't predefined yes or no case
                     //ask the question
                     //get user input
@@ -30,6 +40,14 @@ namespace _20_questions
                     //what question should be added + anaswers
                     //write that to file
 
+                //Play again?
+                Console.Write("Play again? ");
+                response = Console.ReadLine().ToLower();
+                if (response == "no")
+                {
+                    gameOver = true;
+                }
+            }
         }
     }
 
