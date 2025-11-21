@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Text.Json;
+using System.Xml.Linq;
 //import system io
 
 namespace _20_questions
@@ -19,10 +20,23 @@ namespace _20_questions
         static void Main(string[] args)
         {
             // Initialize variables
-            Boolean gameOver = false;
+            bool gameOver = false;
             string line;
             string response;
+            List</**/> nodes = new List</**/>(); //empty, will eventually hold node instances
+            //variable holding parentNode
 
+
+            //if there alr exists a file w data, deserialize
+            if (File.Exists("data.txt"))
+            {
+                using (StreamReader reader = new StreamReader("data.txt"))
+                {
+                    string fileData = reader.ReadToEnd();
+                    nodes = JsonSerializer.Deserialize<List</*node class name*/>>(fileData);
+                }
+            }
+            
             // Welcome message
             Console.WriteLine("Welcome to 20 Questions!");
             Console.WriteLine("Think of an animal, and I will try to guess it.");
@@ -32,20 +46,41 @@ namespace _20_questions
             {
                 //instatiate current response + line number
                 //while the response value isn't predefined yes or no case
-                    //ask the question
-                    //get user input
+                //ask the question
+                //get user input
                 //if win
-                    //you win
+                //you win
                 //if fail
-                    //what question should be added + anaswers
-                    //write that to file
+                //what question should be added + answer
+                //write that to file
+                Console.WriteLine("Add a question!");
+                string newQuestion = Console.ReadLine();
+                Console.WriteLine("Add an answer!");
+                string newAnswer = Console.ReadLine();
+                //^^ from here, add these vals to a new node instance
+
+                //add new node instance to List (.Add())
+
+           
 
                 //Play again?
                 Console.Write("Play again? ");
                 response = Console.ReadLine().ToLower();
                 if (response == "no")
                 {
-                    gameOver = true;
+                    //serialize list to add to file
+                    var options = new JsonSerializerOptions() { WriteIndented = true };
+                    var jsonString = JsonSerializer.Serialize(/*parentNode variable*/, options);
+                    //streamWriter to write to/update file
+                    using(StreamWriter writer = new StreamWriter("data.txt", false))
+                        {
+                        writer.Write(jsonString);
+                        }
+
+
+
+                        gameOver = true;
+
                 }
             }
         }
