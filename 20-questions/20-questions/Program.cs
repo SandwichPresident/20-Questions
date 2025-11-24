@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Text.Json;
+using System.Xml.Linq;
 //import system io
 
 namespace _20_questions
@@ -18,24 +19,70 @@ namespace _20_questions
         //stream write -> "learning" portion 
         static void Main(string[] args)
         {
+            // Initialize variables
+            bool gameOver = false;
+            string line;
+            string response;
+            List</**/> nodes = new List</**/>(); //empty, will eventually hold node instances
+            //variable holding parentNode
+
+
+            //if there alr exists a file w data, deserialize
+            if (File.Exists("data.txt"))
+            {
+                using (StreamReader reader = new StreamReader("data.txt"))
+                {
+                    string fileData = reader.ReadToEnd();
+                    nodes = JsonSerializer.Deserialize<List</*node class name*/>>(fileData);
+                }
+            }
+            
+            // Welcome message
+            Console.WriteLine("Welcome to 20 Questions!");
+            Console.WriteLine("Think of an animal, and I will try to guess it.");
+
             //while loop -> run until user input is defined end case
-
-            //instatiate current response + line number
+            while (!gameOver)
+            {
+                //instatiate current response + line number
                 //while the response value isn't predefined yes or no case
-                    //ask the question
-                    //get user input
+                //ask the question
+                //get user input
                 //if win
-                    //you win
+                //you win
                 //if fail
-                    Console.WriteLine("What question should I have asked you instead?");
-                    string newQuestion = Console.ReadLine();
-                    Console.WriteLine("What would be a good guess if the answer was yes?");
-                    string newYes = Console.ReadLine();
-                    Console.WriteLine("What would be a good guess if the answer was no?");
-                    string newNo = Console.ReadLine();
-                    //what question should be added + anaswers
-                    //write that to file
+                //what question should be added + answer
+                //write that to file
+                Console.WriteLine("Add a question!");
+                string newQuestion = Console.ReadLine();
+                Console.WriteLine("Add an answer!");
+                string newAnswer = Console.ReadLine();
+                //^^ from here, add these vals to a new node instance
 
+                //add new node instance to List (.Add())
+
+           
+
+                //Play again?
+                Console.Write("Play again? ");
+                response = Console.ReadLine().ToLower();
+                if (response == "no")
+                {
+                    //serialize list to add to file
+                    var options = new JsonSerializerOptions() { WriteIndented = true };
+                    var jsonString = JsonSerializer.Serialize(/*parentNode variable*/, options);
+                    //streamWriter to write to/update file
+                    using(StreamWriter writer = new StreamWriter("data.txt", false))
+                        {
+                        writer.Write(jsonString);
+                        }
+
+
+
+                        gameOver = true;
+
+                }
+            }
         }
     }
 
@@ -48,8 +95,50 @@ namespace _20_questions
     //in the file
     //each node is its own line
     //question @ yes line number @ no line number
-    
+
     //pre define a string that goes for the yes and no of a final guess
     //on the predetermined no thing -> trigger new question input stuff
+
+    public class TreeNode
+    {
+        // Special constant meaning "no child → leaf node"
+        public const int noChild = 0;
+
+        // Question or answer text
+        public string Data { get; set; }
+
+        // Child references (linked after loading)
+        public TreeNode YesNode { get; set; }
+        public TreeNode NoNode { get; set; }
+
+        // File line numbers used for linking
+        public int YesLineNumber { get; set; }
+        public int NoLineNumber { get; set; }
+
+        // Main constructor for file-loaded nodes
+        public TreeNode(string data, int yesLine, int noLine)
+        {
+            Data = data;
+            YesLineNumber = yesLine;
+            NoLineNumber = noLine;
+
+            YesNode = null;
+            NoNode = null;
+        }
+
+        // Constructor for new nodes created during the game
+        // New nodes start out as leaves (0 = no child)
+        public TreeNode(string data)
+            : this(data, noChild, noChild)
+        {
+        }
+
+        // A final guess (leaf) is indicated by having no children
+        public bool IsLeaf()
+        {
+            return YesLineNumber == noChild && NoLineNumber == noChild;
+        }
+    }
+
 }
 
