@@ -21,7 +21,6 @@ namespace _20_questions
         {
             // Initialize variables
             bool gameOver = false;
-            string line;
             string response;
             List<TreeNode> nodes = new List<TreeNode>(); //empty, will eventually hold node instances
             //variable holding parentNode
@@ -35,36 +34,67 @@ namespace _20_questions
                     string fileData = reader.ReadToEnd();
                     nodes = JsonSerializer.Deserialize<List<TreeNode>>(fileData);
                 }
-            }
             
-            // Welcome message
-            Console.WriteLine("Welcome to 20 Questions!");
-            Console.WriteLine("Think of an animal, and I will try to guess it.");
 
             //while loop -> run until user input is defined end case
             while (!gameOver)
             {
-                //instatiate current response + line number
                 //while the response value isn't predefined yes or no case
-                //ask the question
-                //get user input
-                //if win
-                //you win
-                //if fail
-                //what question should be added + answer
-                //write that to file
-                Console.WriteLine("Add a question!");
-                string newQuestion = Console.ReadLine();
-                Console.WriteLine("Add an answer!");
-                string newAnswer = Console.ReadLine();
-                //^^ from here, add these vals to a new node instance
+                TreeNode currentQuestion = nodes.FirstOrDefault();
+                    Boolean correctGuess = false;
+                    string answer = null;
+                    while (!currentQuestion.IsLeaf() && !correctGuess)
+                    {
+                        //ask the question
+                        //get user input
+                    }
+                    //if win
+                        //you win
+                    if (correctGuess)
+                    {
 
-                //add new node instance to List (.Add())
+                    }
+                    //if fail
+                        //what question should be added + answer
+                        //write that to file
+                    else
+                    {
+                        Console.WriteLine("Add a question!");
+                        string newQuestion = Console.ReadLine();
+                        Console.WriteLine("Add a guess if the answer was yes!");
+                        string newYesAnswer = Console.ReadLine();
+                        Console.WriteLine("Add a guess if the answer was no!");
+                        string newNoAnswer = Console.ReadLine();
+                        //^^ from here, add these vals to a new node instance
+                        TreeNode newQ = new TreeNode(newQuestion);
+                        TreeNode newYes = new TreeNode(newYesAnswer);
+                        TreeNode newNo = new TreeNode(newNoAnswer);
 
-           
+                        if (answer.ToLower() == "no")
+                        {
+                            currentQuestion.NoNode = newQ;
+                        }
+                        else if (answer.ToLower() == "yes")
+                        {
+                            currentQuestion.YesNode = newYes;
+                        }
+                
 
-                //Play again?
-                Console.Write("Play again? ");
+                        newQ.YesNode = newYes;
+                        newQ.NoNode = newNo;
+
+                        nodes.Add(newQ);
+                        nodes.Add(newYes);
+                        nodes.Add(newNo);    //not sure if these need to be added
+                        //add new node instance to List (.Add())
+                    }
+                        
+                        
+                        
+                        
+
+                    //Play again?
+                    Console.Write("Play again? ");
                 response = Console.ReadLine().ToLower();
                 if (response == "no")
                 {
