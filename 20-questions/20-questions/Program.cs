@@ -33,7 +33,7 @@ namespace _20_questions
                     string fileData = reader.ReadToEnd();
                     nodes = JsonSerializer.Deserialize<List<TreeNode>>(fileData);
                 }
-            } 
+            }
             //Set up questions if file does not exist
             else
             {
@@ -66,91 +66,99 @@ namespace _20_questions
             {
                 //while the response value isn't predefined yes or no case
                 TreeNode currentQuestion = tree.Root;
-                Boolean correctGuess = false;
+                bool correctGuess = false;
                 string answer = null;
 
-                while (!currentQuestion.IsLeaf() && !correctGuess)
+                while (!correctGuess/*!currentQuestion.IsLeaf() && !correctGuess*/)
                 {
                     //ask the question
-                    Console.WriteLine(currentQuestion);
+                    Console.WriteLine(currentQuestion.Data);
+
 
                     //get user input
                     response = Console.ReadLine();
-                    while (!(response == "yes" || response == "no"))
+                    if (!(response == "yes" || response == "no"))
                     {
                         Console.Write("Please enter 'yes' or 'no': ");
                     }
 
-                    if (response == "yes")
+
+                    if (currentQuestion.Data.Contains("Is it a")) //we have reached the "is it a(n) __?" question
                     {
-                        //lead to next "yes" node
-                        currentQuestion = currentQuestion.YesNode;
+                        if (response == "yes")
+                        {
+                            //if win
+                            //you win
+                            Console.WriteLine("You win!");
+                            //correctGuess = true;
+                        }
+                        else if (response == "no")
+                        {
+                            //if fail
+                            //what question should be added + answer
+                            //write that to file
+                            Console.WriteLine("Add a question!");
+                            string newQuestion = Console.ReadLine();
+                            Console.WriteLine("Add a guess if the answer was yes!");
+                            string newYesAnswer = Console.ReadLine();
+                            Console.WriteLine("Add a guess if the answer was no!");
+                            string newNoAnswer = Console.ReadLine();
+                            //^^ from here, add these vals to a new node instance
+                            TreeNode newQ = new TreeNode(newQuestion);
+                            TreeNode newYes = new TreeNode(newYesAnswer);
+                            TreeNode newNo = new TreeNode(newNoAnswer);
+                            currentQuestion.NoNode = newQ;
+                            currentQuestion.YesNode = newYes;
+
+                            newQ.YesNode = newYes;
+                            newQ.NoNode = newNo;
+
+                            //not sure if these need to be added
+                            //add new node instance to List (.Add())
+                            nodes.Add(newQ);
+                            nodes.Add(newYes);
+                            nodes.Add(newNo);
+                             
+                        }
+
+                        }
+
+                        //Play again?
+                        Console.Write("Play again? ");
+                        response = Console.ReadLine().ToLower();
+                        correctGuess = true;
+
+                        //Break game loop if response is "no"
+                        if (response == "no")
+                        {
+                            //serialize list to add to file
+                            var options = new JsonSerializerOptions() { WriteIndented = true };
+                            var jsonString = JsonSerializer.Serialize(tree.Root, options);
+                            //streamWriter to write to/update file
+                            using (StreamWriter writer = new StreamWriter("data.txt", false))
+                            {
+                                writer.Write(jsonString);
+                            }
+
+                            gameOver = true;
+                        }
+
                     }
                     else
                     {
-                        //lead to next "no" node
-                        currentQuestion = currentQuestion.NoNode;
-                    }
-                }
-                //if win
-                //you win
-                if (correctGuess)
-                {
-                    Console.WriteLine("You win!");
-                }
-                //if fail
-                //what question should be added + answer
-                //write that to file
-                else
-                {
-                    Console.WriteLine("Add a question!");
-                    string newQuestion = Console.ReadLine();
-                    Console.WriteLine("Add a guess if the answer was yes!");
-                    string newYesAnswer = Console.ReadLine();
-                    Console.WriteLine("Add a guess if the answer was no!");
-                    string newNoAnswer = Console.ReadLine();
-                    //^^ from here, add these vals to a new node instance
-                    TreeNode newQ = new TreeNode(newQuestion);
-                    TreeNode newYes = new TreeNode(newYesAnswer);
-                    TreeNode newNo = new TreeNode(newNoAnswer);
-
-                    if (answer.ToLower() == "no")
-                    {
-                        currentQuestion.NoNode = newQ;
-                    }
-                    else if (answer.ToLower() == "yes")
-                    {
-                        currentQuestion.YesNode = newYes;
+                        if (response == "yes")
+                        {
+                            //lead to next "yes" node
+                            currentQuestion = currentQuestion.YesNode;
+                        }
+                        else
+                        {
+                            //lead to next "no" node
+                            currentQuestion = currentQuestion.NoNode;
+                        }
                     }
 
 
-                    newQ.YesNode = newYes;
-                    newQ.NoNode = newNo;
-
-                    nodes.Add(newQ);
-                    nodes.Add(newYes);
-                    nodes.Add(newNo);    //not sure if these need to be added
-                                            //add new node instance to List (.Add())
-                }
-
-
-                //Play again?
-                Console.Write("Play again? ");
-                response = Console.ReadLine().ToLower();
-
-                //Break game loop if response is "no"
-                if (response == "no")
-                {
-                    //serialize list to add to file
-                    var options = new JsonSerializerOptions() { WriteIndented = true };
-                    //var jsonString = JsonSerializer.Serialize(/*parentNode variable*/, options);
-                    //streamWriter to write to/update file
-                    using (StreamWriter writer = new StreamWriter("data.txt", false))
-                    {
-                        //writer.Write(jsonString);
-                    }
-
-                    gameOver = true;
                 }
             }
         }
