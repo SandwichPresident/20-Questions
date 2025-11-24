@@ -27,6 +27,12 @@ namespace _20_questions
                 //if win
                     //you win
                 //if fail
+                    Console.WriteLine("What question should I have asked you instead?");
+                    string newQuestion = Console.ReadLine();
+                    Console.WriteLine("What would be a good guess if the answer was yes?");
+                    string newYes = Console.ReadLine();
+                    Console.WriteLine("What would be a good guess if the answer was no?");
+                    string newNo = Console.ReadLine();
                     //what question should be added + anaswers
                     //write that to file
 
