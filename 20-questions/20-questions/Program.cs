@@ -24,7 +24,7 @@ namespace _20_questions
             string response;
             List<TreeNode> nodes = new List<TreeNode>();
             //variable holding parentNode
-
+            QuestionTree tree = new QuestionTree();
 
             //if there alr exists a file w data, deserialize
             if (File.Exists("data.txt"))
@@ -59,17 +59,19 @@ namespace _20_questions
                         if (response == "yes")
                         {
                             //lead to next "yes" node
+                            currentQuestion = currentQuestion.YesNode;
                         }
                         else
                         {
                             //lead to next "no" node
+                            currentQuestion = currentQuestion.NoNode;
                         }
                     }
                     //if win
                     //you win
                     if (correctGuess)
                     {
-
+                        Console.WriteLine("You win!");
                     }
                     //if fail
                     //what question should be added + answer
@@ -116,11 +118,11 @@ namespace _20_questions
                     {
                         //serialize list to add to file
                         var options = new JsonSerializerOptions() { WriteIndented = true };
-                        var jsonString = JsonSerializer.Serialize(/*parentNode variable*/, options);
+                        //var jsonString = JsonSerializer.Serialize(/*parentNode variable*/, options);
                         //streamWriter to write to/update file
                         using (StreamWriter writer = new StreamWriter("data.txt", false))
                         {
-                            writer.Write(jsonString);
+                            //writer.Write(jsonString);
                         }
 
                         gameOver = true;
@@ -137,6 +139,7 @@ namespace _20_questions
 
         //pre define a string that goes for the yes and no of a final guess
         //on the predetermined no thing -> trigger new question input stuff
+
 
         public class TreeNode
         {
@@ -161,6 +164,11 @@ namespace _20_questions
             {
                 return YesNode == null && NoNode == null;
             }
+        }
+
+        public class QuestionTree
+        {
+            TreeNode Root { get; set; }
         }
     }
 }
