@@ -22,7 +22,7 @@ namespace _20_questions
             // Initialize variables
             bool gameOver = false;
             string response;
-            List<TreeNode> nodes = new List<TreeNode>(); //empty, will eventually hold node instances
+            List<TreeNode> nodes = new List<TreeNode>();
             //variable holding parentNode
 
 
@@ -34,29 +34,46 @@ namespace _20_questions
                     string fileData = reader.ReadToEnd();
                     nodes = JsonSerializer.Deserialize<List<TreeNode>>(fileData);
                 }
-            
 
-            //while loop -> run until user input is defined end case
-            while (!gameOver)
-            {
-                //while the response value isn't predefined yes or no case
-                TreeNode currentQuestion = nodes.FirstOrDefault();
+
+                //while loop -> run until user input is defined end case
+                while (!gameOver)
+                {
+                    //while the response value isn't predefined yes or no case
+                    TreeNode currentQuestion = nodes.FirstOrDefault();
                     Boolean correctGuess = false;
                     string answer = null;
+
                     while (!currentQuestion.IsLeaf() && !correctGuess)
                     {
                         //ask the question
+                        Console.WriteLine(currentQuestion);
+
                         //get user input
+                        response = Console.ReadLine();
+                        while (!(response == "yes" || response == "no"))
+                        {
+                            Console.Write("Please enter 'yes' or 'no': ");
+                        }
+
+                        if (response == "yes")
+                        {
+                            //lead to next "yes" node
+                        }
+                        else
+                        {
+                            //lead to next "no" node
+                        }
                     }
                     //if win
-                        //you win
+                    //you win
                     if (correctGuess)
                     {
 
                     }
                     //if fail
-                        //what question should be added + answer
-                        //write that to file
+                    //what question should be added + answer
+                    //write that to file
                     else
                     {
                         Console.WriteLine("Add a question!");
@@ -78,7 +95,7 @@ namespace _20_questions
                         {
                             currentQuestion.YesNode = newYes;
                         }
-                
+
 
                         newQ.YesNode = newYes;
                         newQ.NoNode = newNo;
@@ -86,69 +103,65 @@ namespace _20_questions
                         nodes.Add(newQ);
                         nodes.Add(newYes);
                         nodes.Add(newNo);    //not sure if these need to be added
-                        //add new node instance to List (.Add())
+                                             //add new node instance to List (.Add())
                     }
-                        
-                        
-                        
-                        
+
 
                     //Play again?
                     Console.Write("Play again? ");
-                response = Console.ReadLine().ToLower();
-                if (response == "no")
-                {
-                    //serialize list to add to file
-                    var options = new JsonSerializerOptions() { WriteIndented = true };
-                    var jsonString = JsonSerializer.Serialize(/*parentNode variable*/, options);
-                    //streamWriter to write to/update file
-                    using(StreamWriter writer = new StreamWriter("data.txt", false))
+                    response = Console.ReadLine().ToLower();
+
+                    //Break game loop if response is "no"
+                    if (response == "no")
+                    {
+                        //serialize list to add to file
+                        var options = new JsonSerializerOptions() { WriteIndented = true };
+                        var jsonString = JsonSerializer.Serialize(/*parentNode variable*/, options);
+                        //streamWriter to write to/update file
+                        using (StreamWriter writer = new StreamWriter("data.txt", false))
                         {
-                        writer.Write(jsonString);
+                            writer.Write(jsonString);
                         }
 
-
-
                         gameOver = true;
-
+                    }
                 }
             }
         }
-    }
 
-    //TreeNode class
+        //TreeNode class
 
-    //data -> question / answer text
-    //yes path node
-    //no path node
+        //data -> question / answer text
+        //yes path node
+        //no path node
 
-    //pre define a string that goes for the yes and no of a final guess
-    //on the predetermined no thing -> trigger new question input stuff
+        //pre define a string that goes for the yes and no of a final guess
+        //on the predetermined no thing -> trigger new question input stuff
 
-    public class TreeNode
-    {
-        // Question or answer text
-        public string Data { get; set; }
-
-        // Child references (linked after loading)
-        public TreeNode YesNode { get; set; }
-        public TreeNode NoNode { get; set; }
-
-        // Main constructor for file-loaded nodes
-        public TreeNode(string data)
+        public class TreeNode
         {
-            Data = data;
+            // Question or answer text
+            public string Data { get; set; }
 
-            YesNode = null;
-            NoNode = null;
-        }
+            // Child references (linked after loading)
+            public TreeNode YesNode { get; set; }
+            public TreeNode NoNode { get; set; }
 
-        // A final guess (leaf) is indicated by having no children
-        public bool IsLeaf()
-        {
-            return YesNode == null && NoNode == null;
+            // Main constructor for file-loaded nodes
+            public TreeNode(string data)
+            {
+                Data = data;
+
+                YesNode = null;
+                NoNode = null;
+            }
+
+            // A final guess (leaf) is indicated by having no children
+            public bool IsLeaf()
+            {
+                return YesNode == null && NoNode == null;
+            }
         }
     }
-
 }
 
