@@ -24,7 +24,7 @@ namespace _20_questions
             string response;
             List<TreeNode> nodes = new List<TreeNode>();
             QuestionTree tree = new QuestionTree();
-            string path = "../../../data.txt";
+            string path = "data.txt";
 
             //if there alr exists a file w data, deserialize
             if (File.Exists("data.txt"))
@@ -79,9 +79,10 @@ namespace _20_questions
 
                     //get user input
                     response = Console.ReadLine();
-                    if (!(response == "yes" || response == "no"))
+                    while (!(response == "yes" || response == "no"))
                     {
                         Console.Write("Please enter 'yes' or 'no': ");
+                        response = Console.ReadLine();
                     }
 
 
@@ -123,8 +124,6 @@ namespace _20_questions
                              
                         }
 
-                        }
-
                         //Play again?
                         Console.Write("Play again? ");
                         response = Console.ReadLine().ToLower();
@@ -145,7 +144,7 @@ namespace _20_questions
                             gameOver = true;
                         }
 
-                    
+                    }
                     else
                     {
                         if (response == "yes")
@@ -159,8 +158,6 @@ namespace _20_questions
                             currentQuestion = currentQuestion.NoNode;
                         }
                     }
-
-
                 }
             }
         }
