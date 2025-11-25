@@ -24,11 +24,12 @@ namespace _20_questions
             string response;
             List<TreeNode> nodes = new List<TreeNode>();
             QuestionTree tree = new QuestionTree();
+            string path = "../../../data.txt";
 
             //if there alr exists a file w data, deserialize
             if (File.Exists("data.txt"))
             {
-                using (StreamReader reader = new StreamReader("data.txt"))
+                using (StreamReader reader = new StreamReader(path))
                 {
                     string fileData = reader.ReadToEnd();
                     nodes = JsonSerializer.Deserialize<List<TreeNode>>(fileData);
@@ -37,6 +38,7 @@ namespace _20_questions
             //Set up questions if file does not exist
             else
             {
+
                 tree.Root = new TreeNode("Does it have wings?");
                 tree.Root.YesNode = new TreeNode("Can it fly?");
                 tree.Root.NoNode = new TreeNode("Is it under a foot tall?");
@@ -135,7 +137,7 @@ namespace _20_questions
                             var options = new JsonSerializerOptions() { WriteIndented = true };
                             var jsonString = JsonSerializer.Serialize(tree.Root, options);
                             //streamWriter to write to/update file
-                            using (StreamWriter writer = new StreamWriter("data.txt", false))
+                            using (StreamWriter writer = new StreamWriter(path, false))
                             {
                                 writer.Write(jsonString);
                             }
@@ -143,7 +145,7 @@ namespace _20_questions
                             gameOver = true;
                         }
 
-                    }
+                    
                     else
                     {
                         if (response == "yes")
