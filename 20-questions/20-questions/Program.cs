@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Xml.Linq;
 //import system io
 
@@ -22,8 +24,9 @@ namespace _20_questions
             // Initialize variables
             bool gameOver = false;
             string response;
-            List<TreeNode> nodes = new List<TreeNode>();
             QuestionTree tree = new QuestionTree();
+            TreeNode win = new TreeNode("I win!");
+            TreeNode lose = new TreeNode("I lost :(");
             string path = "data.txt";
 
             //if there alr exists a file w data, deserialize
@@ -32,7 +35,7 @@ namespace _20_questions
                 using (StreamReader reader = new StreamReader(path))
                 {
                     string fileData = reader.ReadToEnd();
-                    nodes = JsonSerializer.Deserialize<List<TreeNode>>(fileData);
+                    tree.Root = JsonSerializer.Deserialize<TreeNode>(fileData);
                 }
             }
             //Set up questions if file does not exist
@@ -45,19 +48,35 @@ namespace _20_questions
 
                 tree.Root.YesNode.YesNode = new TreeNode("Does it honk?");
                 tree.Root.YesNode.YesNode.YesNode = new TreeNode("Is it a goose?");
+                tree.Root.YesNode.YesNode.YesNode.YesNode = win;
+                tree.Root.YesNode.YesNode.YesNode.NoNode = lose;
                 tree.Root.YesNode.YesNode.NoNode = new TreeNode("Is it a pigeon?");
+                tree.Root.YesNode.YesNode.NoNode.YesNode = win;
+                tree.Root.YesNode.YesNode.NoNode.NoNode = lose;
 
                 tree.Root.YesNode.NoNode = new TreeNode("Does it live on a farm?");
                 tree.Root.YesNode.NoNode.YesNode = new TreeNode("Is it a chicken?");
+                tree.Root.YesNode.NoNode.YesNode.YesNode = win;
+                tree.Root.YesNode.NoNode.YesNode.NoNode = lose;
                 tree.Root.YesNode.NoNode.NoNode = new TreeNode("Is it a penguin?");
+                tree.Root.YesNode.NoNode.NoNode.YesNode = win;
+                tree.Root.YesNode.NoNode.NoNode.NoNode = lose;
 
                 tree.Root.NoNode.YesNode = new TreeNode("Can it camoflauge?");
                 tree.Root.NoNode.YesNode.YesNode = new TreeNode("Is it a chameleon?");
+                tree.Root.NoNode.YesNode.YesNode.YesNode = win;
+                tree.Root.NoNode.YesNode.YesNode.NoNode = lose;
                 tree.Root.NoNode.YesNode.NoNode = new TreeNode("Is it a mouse?");
+                tree.Root.NoNode.YesNode.NoNode.YesNode = win;
+                tree.Root.NoNode.YesNode.NoNode.NoNode = lose;
 
                 tree.Root.NoNode.NoNode = new TreeNode("Does it have large ears?");
                 tree.Root.NoNode.NoNode.YesNode = new TreeNode("Is it an elephant?");
+                tree.Root.NoNode.NoNode.YesNode.YesNode = win;
+                tree.Root.NoNode.NoNode.YesNode.NoNode = lose;
                 tree.Root.NoNode.NoNode.NoNode = new TreeNode("Is it a deer?");
+                tree.Root.NoNode.NoNode.NoNode.YesNode = win;
+                tree.Root.NoNode.NoNode.NoNode.NoNode = lose;
             }
 
             //variable holding parentNode
@@ -68,6 +87,7 @@ namespace _20_questions
             {
                 //while the response value isn't predefined yes or no case
                 TreeNode currentQuestion = tree.Root;
+                TreeNode previousQuestion = null;
                 bool correctGuess = false;
                 string answer = null;
 
@@ -76,26 +96,34 @@ namespace _20_questions
                     //ask the question
                     Console.WriteLine(currentQuestion.Data);
 
-
                     //get user input
-                    response = Console.ReadLine();
-                    while (!(response == "yes" || response == "no"))
+                    if (currentQuestion.Data != win.Data && currentQuestion.Data != lose.Data) //isnt at the end of a branch
                     {
-                        Console.Write("Please enter 'yes' or 'no': ");
+                        Console.WriteLine("not the end");
                         response = Console.ReadLine();
-                    }
+                        while (!(response == "yes" || response == "no"))
+                        {
+                            Console.Write("Please enter 'yes' or 'no': ");
+                            response = Console.ReadLine();
+                        }
 
-
-                    if (currentQuestion.Data.Contains("Is it a")) //we have reached the "is it a(n) __?" question
-                    {
                         if (response == "yes")
                         {
-                            //if win
-                            //you win
-                            Console.WriteLine("You win!");
-                            //correctGuess = true;
+                            //lead to next "yes" node
+                            previousQuestion = currentQuestion;
+                            currentQuestion = currentQuestion.YesNode;
                         }
-                        else if (response == "no")
+                        else
+                        {
+                            //lead to next "no" node
+                            previousQuestion = currentQuestion;
+                            currentQuestion = currentQuestion.NoNode;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("the end");
+                        if (currentQuestion.Data == lose.Data)
                         {
                             //if fail
                             //what question should be added + answer
@@ -110,18 +138,16 @@ namespace _20_questions
                             TreeNode newQ = new TreeNode(newQuestion);
                             TreeNode newYes = new TreeNode(newYesAnswer);
                             TreeNode newNo = new TreeNode(newNoAnswer);
-                            currentQuestion.NoNode = newQ;
-                            currentQuestion.YesNode = newYes;
-
+                            
+                            newYes.YesNode = win;
+                            newYes.NoNode = lose;
                             newQ.YesNode = newYes;
+
+                            newNo.YesNode = win;
+                            newNo.NoNode = lose;
                             newQ.NoNode = newNo;
 
-                            //not sure if these need to be added
-                            //add new node instance to List (.Add())
-                            nodes.Add(newQ);
-                            nodes.Add(newYes);
-                            nodes.Add(newNo);
-                             
+                            previousQuestion.NoNode = newQ;
                         }
 
                         //Play again?
@@ -133,7 +159,7 @@ namespace _20_questions
                         if (response == "no")
                         {
                             //serialize list to add to file
-                            var options = new JsonSerializerOptions() { WriteIndented = true };
+                            var options = new JsonSerializerOptions() { WriteIndented = true};
                             var jsonString = JsonSerializer.Serialize(tree.Root, options);
                             //streamWriter to write to/update file
                             using (StreamWriter writer = new StreamWriter(path, false))
@@ -144,19 +170,6 @@ namespace _20_questions
                             gameOver = true;
                         }
 
-                    }
-                    else
-                    {
-                        if (response == "yes")
-                        {
-                            //lead to next "yes" node
-                            currentQuestion = currentQuestion.YesNode;
-                        }
-                        else
-                        {
-                            //lead to next "no" node
-                            currentQuestion = currentQuestion.NoNode;
-                        }
                     }
                 }
             }
